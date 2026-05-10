@@ -1,0 +1,59 @@
+{% extends 'canteen/base.html' %}
+{% load static %}
+{% block title %}Menu - Campus Canteen{% endblock %}
+{% block content %}
+<div class="home-hero">
+    <div class="container py-4">
+        <h1 class="hero-title">What are you craving today? 😋</h1>
+        <p class="hero-subtitle">Fresh food, quick service!</p>
+        <div class="category-pills">
+            {% for category in categories %}
+            <a href="#cat-{{ category.slug }}" class="category-pill">{{ category.icon }} {{ category.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="container py-4">
+    {% for category in categories %}
+    {% if category.available_items %}
+    <section id="cat-{{ category.slug }}" class="menu-section mb-5">
+        <div class="section-header">
+            <h2 class="section-title"><span class="section-icon">{{ category.icon }}</span>{{ category.name }}</h2>
+            <span class="section-count">{{ category.available_items|length }} items</span>
+        </div>
+        <div class="row g-3">
+            {% for item in category.available_items %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="food-card" id="food-card-{{ item.id }}">
+                    <div class="veg-badge-wrap">
+                        {% if item.is_veg %}<span class="veg-badge veg">🟢 Veg</span>
+                        {% else %}<span class="veg-badge nonveg">🔴 Non-Veg</span>{% endif %}
+                    </div>
+                    <div class="food-img-wrap">
+                        {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}" class="food-img">
+                        {% else %}<div class="food-img-placeholder">{{ category.icon }}</div>{% endif %}
+                    </div>
+                    <div class="food-card-body">
+                        <h6 class="food-name">{{ item.name }}</h6>
+                        {% if item.description %}<p class="food-desc">{{ item.description|truncatechars:50 }}</p>{% endif %}
+                        <div class="food-footer">
+                            <span class="food-price">₹{{ item.price }}</span>
+                            <div class="qty-controls" id="qty-{{ item.id }}" style="display:none;">
+                                <button class="qty-btn" onclick="changeQty({{ item.id }}, -1)">−</button>
+                                <span class="qty-display" id="qty-count-{{ item.id }}">0</span>
+                                <button class="qty-btn" onclick="changeQty({{ item.id }}, 1)">+</button>
+                            </div>
+                            <button class="add-btn" id="add-btn-{{ item.id }}" onclick="addToCart({{ item.id }})">
+                                <i class="fas fa-plus me-1"></i>ADD
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

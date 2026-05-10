@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My Cart - Campus Canteen{% endblock %}
+{% block content %}
+<div class="container py-4">
+<h2 class="page-title mb-4"><i class="fas fa-shopping-cart me-2" style="color:var(--primary)"></i>Your Cart</h2>
+{% if cart_items %}
+<div class="row g-4">
+<div class="col-lg-8">
+<div class="cart-card">
+{% for item in cart_items %}
+<div class="cart-item" id="cart-row-{{ item.menu_item.id }}">
+<div class="cart-item-img">{% if item.menu_item.image %}<img src="{{ item.menu_item.image.url }}" alt="{{ item.menu_item.name }}">{% else %}<div class="cart-img-placeholder">{{ item.menu_item.category.icon }}</div>{% endif %}</div>
+<div class="cart-item-info"><h6 class="cart-item-name">{{ item.menu_item.name }}</h6><span class="cart-item-price">₹{{ item.menu_item.price }} each</span></div>
+<div class="qty-controls-cart">
+<button class="qty-btn-cart" onclick="changeQty({{ item.menu_item.id }}, -1)">-</button>
+<span class="qty-num" id="qty-count-{{ item.menu_item.id }}">{{ item.quantity }}</span>
+<button class="qty-btn-cart" onclick="changeQty({{ item.menu_item.id }}, 1)">+</button>
+</div>
+<div class="cart-item-subtotal" id="subtotal-{{ item.menu_item.id }}">₹{{ item.subtotal }}</div>
+<form method="post" action="{% url 'delete_cart_item' item.menu_item.id %}">{% csrf_token %}<button type="submit" class="cart-delete-btn"><i class="fas fa-trash"></i></button></form>
+</div>
+{% endfor %}
+</div>
+<form method="post" action="{% url 'clear_cart' %}" class="mt-3">{% csrf_token %}
+<button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Clear entire cart?')"><i class="fas fa-trash me-1"></i>Clear Cart</button>
+</form>
+</div>
+<div class="col-lg-4">
+<div class="order-summary-card">
+<h5 class="fw-bold mb-3">Order Summary</h5>
+<div class="summary-row"><span>Items ({{ cart.item_count }})</span><span id="summaryTotal">₹{{ cart.total }}</span></div>
+<div class="summary-row"><span>Delivery</span><span class="fw-bold" style="color:var(--success)">FREE</span></div>
+<hr>
+<div class="summary-row total-row"><span>Total</span><span id="grandTotal">₹{{ cart.total }}</span></div>
+<a href="{% url 'payment' %}" class="btn btn-success w-100 btn-lg mt-3"><i class="fas fa-credit-card me-2"></i>Proceed to Pay</a>
+<a href="{% url 'home' %}" class="btn btn-outline-secondary w-100 mt-2"><i class="fas fa-arrow-left me-1"></i>Add More Items</a>
+</div>
+</div>
+</div>
+{% else %}
+<div class="text-center py-5">
+<div style="font-size:5rem;">🛒</div>
+<h3 class="mt-3">Your cart is empty!</h3>
+<p class="text-muted">Browse our menu and add items.</p>
+<a href="{% url 'home' %}" class="btn btn-primary btn-lg mt-2"><i class="fas fa-utensils me-2"></i>Browse Menu</a>
+</div>
+{% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>{% for item in cart_items %}cartQuantities[{{ item.menu_item.id }}] = {{ item.quantity }};{% endfor %}</script>
+{% endblock %}

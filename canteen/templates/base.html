@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Campus Canteen{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'canteen/css/style.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" id="mainNavbar">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+            🍽️ Campus Canteen
+        </a>
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                       href="{% url 'home' %}">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'order_history' %}active{% endif %}"
+                       href="{% url 'order_history' %}">
+                        <i class="fas fa-receipt me-1"></i>My Orders
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <a class="nav-link cart-nav-btn" href="{% url 'cart' %}">
+                        <i class="fas fa-shopping-cart"></i> Cart
+                        <span class="cart-badge" id="navCartCount">{{ cart_count }}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link payment-nav-btn" href="{% url 'payment' %}">
+                        <i class="fas fa-credit-card"></i> Pay Now
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <button class="dark-mode-btn" id="darkModeToggle" onclick="toggleDarkMode()">
+                        <i class="fas fa-moon" id="darkModeIcon"></i>
+                    </button>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle user-nav" href="#"
+                       data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>
+                        {{ user.first_name|default:user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <span class="dropdown-item-text text-muted small">
+                                {{ user.email }}
+                            </span>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'order_history' %}">
+                                <i class="fas fa-history me-2"></i>Order History
+                            </a>
+                        </li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endif %}
+
+{% if messages %}
+<div class="toast-container position-fixed top-0 end-0 p-3"
+     style="z-index:9999;margin-top:70px;">
+    {% for message in messages %}
+    <div class="toast align-items-center text-white
+        {% if message.tags == 'success' %}bg-success
+        {% elif message.tags == 'error' %}bg-danger
+        {% elif message.tags == 'warning' %}bg-warning text-dark
+        {% else %}bg-info{% endif %} border-0 show" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold">{{ message }}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+{% if user.is_authenticated and request.resolver_match.url_name == 'home' %}
+<div class="show-cart-bar" id="showCartBar">
+    <a href="{% url 'cart' %}" class="show-cart-btn">
+        <i class="fas fa-shopping-cart me-2"></i>View Cart
+        <span class="show-cart-count" id="showCartCount">{{ cart_count }}</span>
+        <span class="show-cart-total" id="showCartTotal"></span>
+    </a>
+</div>
+{% endif %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'canteen/js/cart.js' %}"></script>
+{% block extra_js %}{% endblock %}
+
+<script>
+document.querySelectorAll('.toast').forEach(el => {
+    setTimeout(() => bootstrap.Toast.getOrCreateInstance(el).hide(), 3500);
+});
+</script>
+<script>
+function toggleDarkMode() {
+    const body = document.body;
+    const icon = document.getElementById('darkModeIcon');
+    const isDark = body.classList.toggle('dark-mode');
+    icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+}
+
+// Load saved preference on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('darkMode');
+    if (saved === 'enabled') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('darkModeIcon');
+        if (icon) icon.className = 'fas fa-sun';
+    }
+});
+</script>
+</body>
+</html>

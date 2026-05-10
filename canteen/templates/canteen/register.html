@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Campus Canteen</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'canteen/css/style.css' %}" rel="stylesheet">
+</head>
+<body class="auth-body">
+<div class="auth-container">
+    <div class="auth-card" style="max-width:500px;">
+        <div class="auth-header">
+            <span class="auth-logo">🍽️</span>
+            <h2>Create Account</h2>
+            <p class="text-muted">Join Campus Canteen today</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-6">
+                    <label class="form-label fw-bold">First Name</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors }}</div>{% endif %}
+                </div>
+                <div class="col-6">
+                    <label class="form-label fw-bold">Last Name</label>
+                    {{ form.last_name }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Password</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Confirm Password</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}<div class="text-danger small">{{ form.password2.errors }}</div>{% endif %}
+                </div>
+            </div>
+            {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors }}</div>{% endif %}
+            <button type="submit" class="btn btn-success w-100 btn-lg auth-submit-btn mt-4">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+        </form>
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{% extends 'canteen/base.html' %}
+{% load static %}
+{% block title %}Payment - Campus Canteen{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="page-title mb-4"><i class="fas fa-credit-card me-2" style="color:var(--primary)"></i>Payment</h2>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <form method="post" action="{% url 'process_payment' %}" id="paymentForm">
+                {% csrf_token %}
+                <div class="payment-card mb-4">
+                    <h5 class="fw-bold mb-3">Choose Payment Method</h5>
+                    <div class="payment-methods">
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" value="cash" id="cashRadio" checked onchange="showPaymentForm(this.value)">
+                            <label for="cashRadio" class="payment-label">
+                                <div class="payment-icon cash-icon">💵</div>
+                                <div><div class="fw-bold">Cash Payment</div><small class="text-muted">Pay at the counter</small></div>
+                                <div class="ms-auto check-icon">✓</div>
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" value="upi" id="upiRadio" onchange="showPaymentForm(this.value)">
+                            <label for="upiRadio" class="payment-label">
+                                <div class="payment-icon upi-icon">📱</div>
+                                <div><div class="fw-bold">UPI Payment</div><small class="text-muted">GPay, PhonePe, Paytm</small></div>
+                                <div class="ms-auto check-icon">✓</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div id="cash-section" class="payment-card mb-4">
+                    <h6 class="fw-bold mb-2" style="color:var(--success)">Cash Instructions</h6>
+                    <p class="text-muted mb-0">Please pay <strong>₹{{ cart.total }}</strong> at the counter when collecting your order.</p>
+                </div>
+                <div id="upi-section" class="payment-card mb-4" style="display:none;">
+                    <h6 class="fw-bold mb-3">UPI Payment</h6>
+                    <div class="upi-qr-box mb-3">
+                        <div class="qr-placeholder">
+                            <div class="qr-icon">📱</div>
+                            <p class="fw-bold mt-2 mb-0">Canteen UPI ID</p>
+                            <p class="fw-bold fs-5" style="color:var(--primary)">canteen@upi</p>
+                        </div>
+                        <p class="text-muted small mt-2">Pay <strong>₹{{ cart.total }}</strong> via UPI</p>
+                    </div>
+                    <div class="mb-3"><label class="form-label fw-bold">Your UPI ID</label>{{ upi_form.upi_id }}</div>
+                    <div class="mb-3"><label class="form-label fw-bold">Transaction / UTR Number</label>{{ upi_form.transaction_id }}<div class="form-text">Find this in your UPI app after payment.</div></div>
+                </div>
+                <button type="submit" class="btn btn-success btn-lg w-100" id="placeOrderBtn">
+                    <i class="fas fa-check-circle me-2"></i>Place Order - ₹{{ cart.total }}
+                </button>
+            </form>
+        </div>
+        <div class="col-lg-5">
+            <div class="order-summary-card">
+                <h5 class="fw-bold mb-3">Order Summary</h5>
+                {% for item in cart_items %}<div class="summary-item"><span>{{ item.menu_item.name }} x {{ item.quantity }}</span><span class="fw-semibold">₹{{ item.subtotal }}</span></div>{% endfor %}
+                <hr>
+                <div class="summary-row total-row"><span class="fs-5">Total</span><span class="fs-5 fw-bold" style="color:var(--success)">₹{{ cart.total }}</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'canteen/js/payment.js' %}"></script>{% endblock %}
